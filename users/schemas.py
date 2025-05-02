@@ -1,6 +1,34 @@
 from pydantic import BaseModel
 from typing import Optional
 
+# -------- User Schemas --------
+class UserBase(BaseModel):
+    email: str
+
+class UserCreate(UserBase):
+    password: str
+    username: str
+
+class User(UserBase):
+    id: int
+    role: str
+
+    class Config:
+        orm_mode = True
+
+class UserOut(UserBase):
+    id: int
+    role: str
+
+    class Config:
+        orm_mode = True
+
+class UserUpdate(BaseModel):
+    email: Optional[str] = None
+    password: Optional[str] = None
+    role: Optional[str] = None
+
+
 # -------- Address Schemas --------
 class AddressBase(BaseModel):
     country: str
@@ -11,41 +39,15 @@ class AddressBase(BaseModel):
 class AddressCreate(AddressBase):
     pass
 
+class AddressUpdate(BaseModel):
+    country: Optional[str] = None
+    city: Optional[str] = None
+    street: Optional[str] = None
+    postal_code: Optional[str] = None
+
 class Address(AddressBase):
     id: int
     user_id: int
 
     class Config:
         orm_mode = True
-
-# -------- User Schemas --------
-class UserBase(BaseModel):
-    email: str
-
-class UserCreate(BaseModel):  # No incluye `role` porque se asignará en el backend
-    email: str
-    password: str
-    address: AddressCreate
-    username: str
-
-class User(UserBase):
-    id: int
-    role: str  # El rol será asignado automáticamente por el backend
-    address: Address
-
-    class Config:
-        orm_mode = True
-
-class UserOut(UserBase):
-    id: int
-    role: str
-    address: Address
-
-    class Config:
-        orm_mode = True
-
-class UserUpdate(BaseModel):
-    email: Optional[str] = None
-    password: Optional[str] = None
-    role: Optional[str] = None
-    address: Optional[AddressCreate] = None

@@ -21,7 +21,6 @@ def hash_password(password: str):
 def verify_password(plain_password: str, hashed_password: str):
     return pwd_context.verify(plain_password, hashed_password)
 
-# Función para generar el token JWT
 def create_jwt_token(user_id: int):
     expiration = datetime.utcnow() + timedelta(hours=1)
     token = jwt.encode({"sub": user_id, "exp": expiration}, "your_secret_key", algorithm="HS256")  # Asegúrate de poner tu clave secreta en lugar de "your_secret_key"
@@ -49,17 +48,8 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
             new_user = User(username=user.username, email=user.email, password=hashed_password, role=role)
             db.add(new_user)
 
-            # Crear la dirección del usuario
-            new_address = Address(
-                user_id=new_user.id,
-                street=user.address.street,
-                city=user.address.city,
-                postal_code=user.address.postal_code,
-                country=user.address.country
-            )
-            db.add(new_address)
-
         # Si todo está bien, se hace commit automáticamente
+
         return new_user
     except SQLAlchemyError as e:
         db.rollback()  # Asegurarse de que se haga rollback si hay un error
