@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from core.database import get_db  # Usamos get_db para obtener la sesión de base de datos
 from users.models import User
 from users.schemas import UserCreate, UserOut
-from users.models import Address
 from passlib.context import CryptContext
 import jwt
 from datetime import datetime, timedelta

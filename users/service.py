@@ -13,13 +13,8 @@ def hash_password(password: str) -> str:
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
     return hashed_password.decode('utf-8')
 
-# ---------------- CREAR USUARIO ----------------
 def create_user(db: Session, user: schemas.UserCreate):
-    # Aseguramos que se proporciona una dirección
-    if not user.address:
-        raise HTTPException(status_code=400, detail="Address is required")
 
-    # Asignación automática de rol
     role = "admin" if user.email in ADMIN_EMAILS else "user"  # Asigna admin si el correo está en la lista
 
     # Hashear la contraseña antes de guardarla
@@ -27,18 +22,10 @@ def create_user(db: Session, user: schemas.UserCreate):
 
     db_user = models.User(
         email=user.email,
-        password=hashed_password,  # Guardamos la contraseña hasheada
+        password=hashed_password,
         role=role
     )
 
-    db_address = models.Address(
-        country=user.address.country,
-        city=user.address.city,
-        street=user.address.street,
-        postal_code=user.address.postal_code
-    )
-
-    db_user.address = db_address
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -89,7 +76,6 @@ def update_user(db: Session, user_id: int, user_update: schemas.UserUpdate, curr
     db.refresh(user)
     return user
 
-# ---------------- ELIMINAR USUARIO ----------------
 def delete_user(db: Session, user_id: int):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
