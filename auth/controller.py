@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from core.database import get_db  # Usamos get_db para obtener la sesión de base de datos
 from users.models import User
-from users.schemas import UserCreate, UserOut
+from users.schemas import UserCreate, UserOut, UserLogin
 from passlib.context import CryptContext
 import jwt
 from datetime import datetime, timedelta
@@ -59,7 +59,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/login")
-def login_user(user: UserCreate, db: Session = Depends(get_db)):
+def login_user(user: UserLogin, db: Session = Depends(get_db)):
     # Buscar al usuario por email
     db_user = db.query(User).filter(User.email == user.email).first()
     
