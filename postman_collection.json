@@ -1,0 +1,191 @@
+{
+    "info": {
+        "name": "Api_user",
+        "description": "Colección de endpoints para el proyecto Api_user",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+        },
+        "item": [
+        {
+            "name": "Auth",
+            "item": [
+            {
+                "name": "Register User",
+                "request": {
+                "method": "POST",
+                "header": [
+                    {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "http://localhost:8000/auth/register",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "8000",
+                    "path": ["auth", "register"]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"testuser@example.com\",\n  \"password\": \"password123\"\n}"
+                }
+                },
+                "response": []
+            },
+            {
+                "name": "Login User",
+                "request": {
+                "method": "POST",
+                "header": [
+                    {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "http://localhost:8000/auth/login",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "8000",
+                    "path": ["auth", "login"]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"email\": \"testuser@example.com\",\n  \"password\": \"password123\"\n}"
+                }
+                },
+                "response": []
+            }
+            ]
+        },
+        {
+            "name": "Users",
+            "item": [
+            {
+                "name": "Get User",
+                "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:8000/users/{user_id}",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "8000",
+                    "path": ["users", "{user_id}"],
+                    "variable": [
+                    {
+                        "key": "user_id",
+                        "value": "1"
+                    }
+                    ]
+                }
+                },
+                "response": []
+            },
+            {
+                "name": "Get All Users",
+                "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:8000/users?skip=0&limit=10",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "8000",
+                    "path": ["users"],
+                    "query": [
+                    {
+                        "key": "skip",
+                        "value": "0"
+                    },
+                    {
+                        "key": "limit",
+                        "value": "10"
+                    }
+                    ]
+                }
+                },
+                "response": []
+            },
+            {
+                "name": "Update User",
+                "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "http://localhost:8000/users/{user_id}",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "8000",
+                    "path": ["users", "{user_id}"],
+                    "variable": [
+                    {
+                        "key": "user_id",
+                        "value": "1"
+                    }
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"email\": \"updateduser@example.com\",\n  \"password\": \"newpassword123\",\n  \"role\": \"user\"\n}"
+                }
+                },
+                "response": []
+            },
+            {
+                "name": "Delete User",
+                "request": {
+                "method": "DELETE",
+                "url": {
+                    "raw": "http://localhost:8000/users/{user_id}",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "8000",
+                    "path": ["users", "{user_id}"],
+                    "variable": [
+                    {
+                        "key": "user_id",
+                        "value": "1"
+                    }
+                    ]
+                }
+                },
+                "response": []
+            },
+            {
+                "name": "Add or Update Address",
+                "request": {
+                "method": "POST",
+                "header": [
+                    {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "http://localhost:8000/users/{user_id}/address",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "8000",
+                    "path": ["users", "{user_id}", "address"],
+                    "variable": [
+                    {
+                        "key": "user_id",
+                        "value": "1"
+                    }
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"country\": \"Peru\",\n  \"city\": \"Lima\",\n  \"street\": \"Av. Principal\",\n  \"postal_code\": \"15000\"\n}"
+                }
+                },
+                "response": []
+            }
+            ]
+        }
+    ]
+}
