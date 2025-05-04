@@ -5,9 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="82b74d53-fe64-4e2c-aa49-a9515aa74852" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth/controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/auth/controller.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/users/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/schemas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/database.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/service.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/service.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,11 +65,15 @@
       <workItem from="1746210578000" duration="3686000" />
       <workItem from="1746219195059" duration="8674000" />
       <workItem from="1746234836785" duration="802000" />
-      <workItem from="1746298858892" duration="3103000" />
+      <workItem from="1746298858892" duration="9002000" />
+      <workItem from="1746325361173" duration="394000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName=".env" />
   </component>
 </project>

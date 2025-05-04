@@ -58,20 +58,6 @@ def update_user(db: Session, user_id: int, user_update: schemas.UserUpdate, curr
     if user_update.role:
         user.role = user_update.role
 
-    if user_update.address:
-        if user.address:
-            user.address.country = user_update.address.country
-            user.address.city = user_update.address.city
-            user.address.street = user_update.address.street
-            user.address.postal_code = user_update.address.postal_code
-        else:
-            user.address = models.Address(
-                country=user_update.address.country,
-                city=user_update.address.city,
-                street=user_update.address.street,
-                postal_code=user_update.address.postal_code
-            )
-
     db.commit()
     db.refresh(user)
     return user
