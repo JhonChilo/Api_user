@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
+import jwt
 from sqlalchemy.orm import Session
 from typing import List
 from . import schemas, service, models
 from .schemas import AddressCreate, Address
 from core.database import get_db
+
 
 router = APIRouter()
 
@@ -53,3 +55,14 @@ def add_or_update_address(user_id: int, address_data: AddressCreate, db: Session
     db.refresh(existing_address if existing_address else new_address)
 
     return existing_address if existing_address else new_address
+
+#------------------------Verificar autenticación------------------------
+@router.post("/verify-token")
+def verify_token(token: str):
+    try:
+        payload = jwt.decode(token, "your_secret_key", algorithms=["HS256"])
+        return {"valid": True, "user_id": payload.get("sub")}
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
