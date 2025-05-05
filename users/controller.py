@@ -16,8 +16,12 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
 
 # ---------------- LEER TODOS LOS USUARIOS ----------------
 @router.get("", response_model=List[schemas.User])
-def get_users(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-    return service.get_users(db, skip, limit)
+def get_users(page: int = 1, size: int = 10, db: Session = Depends(get_db)):
+    if page < 1 or size < 1:
+        raise HTTPException(status_code=400, detail="Page and size must be greater than 0")
+    
+    skip = (page - 1) * size
+    return service.get_users(db, skip, size)
 
 @router.put("/{user_id}", response_model=schemas.User)
 def update_user(user_id: int, user_update: schemas.UserUpdate, db: Session = Depends(get_db)):

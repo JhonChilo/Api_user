@@ -1,7 +1,6 @@
-version: "3.9"
-
 services:
-  api:
+  app:
+    container_name: api-usuarios
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,6 +10,9 @@ services:
       - db
     environment:
       - SQLALCHEMY_DATABASE_URL=mysql+pymysql://Jhon:Erick2017@db:3306/api_user
+    networks:
+      - internal_network
+      
 
   db:
     image: mysql:8.0
@@ -25,6 +27,12 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    networks:
+      - internal_network
 
 volumes:
   mysql_data:
+
+networks:
+  internal_network:
+    external: true
