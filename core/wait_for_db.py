@@ -1,8 +1,12 @@
 import time
 import pymysql
 from sqlalchemy import create_engine
+import os
+from dotenv import load_dotenv
 
-SQLALCHEMY_DATABASE_URL = "mysql+pymysql://Jhon:Erick2017@db:3306/api_user"
+load_dotenv()
+
+SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL")
 
 def wait_for_db():
     while True:

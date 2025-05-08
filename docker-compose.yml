@@ -6,33 +6,11 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
-    depends_on:
-      - db
     environment:
-      - SQLALCHEMY_DATABASE_URL=mysql+pymysql://Jhon:Erick2017@db:3306/api_user
+      - SQLALCHEMY_DATABASE_URL="postgresql+psycopg2://usuario:contraseña@localhost:5432/nombre_base_datos"
     networks:
       - internal_network
       
-
-  db:
-    image: mysql:8.0
-    container_name: mysql_container
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: api_user
-      MYSQL_USER: Jhon
-      MYSQL_PASSWORD: Erick2017
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    networks:
-      - internal_network
-
-volumes:
-  mysql_data:
-
 networks:
   internal_network:
     external: true
