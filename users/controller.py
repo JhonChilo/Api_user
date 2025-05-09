@@ -64,8 +64,10 @@ def add_or_update_address(user_id: int, address_data: AddressCreate, db: Session
 
 @router.get("/addresses/{address_id}", response_model=Address)
 def get_address_by_id(address_id: str, db: Session = Depends(get_db)):
-    return db.query(models.Address).filter(models.Address.direccion_ == address_id).first()
-
+    address = db.query(models.Address).filter(models.Address.direccion_ == address_id).first()
+    if not address:
+        raise HTTPException(status_code=404, detail="Address not found")
+    return address
 @router.put("/addresses/{address_id}", response_model=Address)
 def update_address(address_id: str, address_update: AddressCreate, db: Session = Depends(get_db)):
     address = db.query(models.Address).filter(models.Address.direccion_ == address_id).first()
