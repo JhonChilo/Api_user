@@ -2,67 +2,49 @@ from pydantic import BaseModel
 from typing import Optional
 
 # -------- User Schemas --------
-class User(BaseModel):
-    id: int
+class UserBase(BaseModel):
     name: str
     mail: str
-    telefono: str | None = None
-    usrdir: str | None = None
+    telefono: Optional[str] = None
+    usrdir: Optional[str] = None
     rol: str
-    fecha_creacion: str | None = None
+    fecha_creacion: Optional[str] = None
 
     class Config:
-        from_attributes = True  # Para Pydantic v2, antes era orm_mode = True
+        from_attributes = True  # Para Pydantic v2
 
 class UserCreate(UserBase):
     password: str
-    username: str
 
 class UserLogin(BaseModel):
-    email: str
+    mail: str
     password: str
 
 class User(UserBase):
     id: int
-    role: str
-    username: str
 
     class Config:
-        orm_mode = True
-
-class UserOut(UserBase):
-    id: int
-    role: str
-    username: str
-
-    class Config:
-        orm_mode = True
+        from_attributes = True
 
 class UserUpdate(BaseModel):
-    email: Optional[str] = None
+    name: Optional[str] = None
+    mail: Optional[str] = None
+    telefono: Optional[str] = None
+    usrdir: Optional[str] = None
+    rol: Optional[str] = None
     password: Optional[str] = None
-    role: Optional[str] = None
-
+    fecha_creacion: Optional[str] = None
 
 # -------- Address Schemas --------
 class AddressBase(BaseModel):
-    country: str
-    city: str
-    street: str
-    postal_code: Optional[str] = None
+    direccion_: str
+    distrito: str
+    codigo_postal: Optional[str] = None
+    pais: str
 
 class AddressCreate(AddressBase):
     pass
 
-class AddressUpdate(BaseModel):
-    country: Optional[str] = None
-    city: Optional[str] = None
-    street: Optional[str] = None
-    postal_code: Optional[str] = None
-
 class Address(AddressBase):
-    id: int
-    user_id: int
-
     class Config:
-        orm_mode = True
+        from_attributes = True
