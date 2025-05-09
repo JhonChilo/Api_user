@@ -27,7 +27,7 @@ def create_jwt_token(user_id: int):
 
 ADMIN_EMAILS = ["jhon.chilo@utec.edu.pe", "sergio.delgado.a@utec.edu.pe"]
 
-@router.post("/register", response_model=UserOut)
+@router.post("/register")
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
     try:
         db_user = db.query(User).filter(User.mail == user.mail).first()
@@ -49,7 +49,21 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
-        return new_user
+
+        # Generar el token
+        token = create_jwt_token(new_user.id)
+
+        # Retornar id, token y datos del usuario
+        return {
+            "id": new_user.id,
+            "name": new_user.name,
+            "mail": new_user.mail,
+            "telefono": new_user.telefono,
+            "usrdir": new_user.usrdir,
+            "rol": new_user.rol,
+            "fecha_creacion": new_user.fecha_creacion,
+            "token": token
+        }
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=500, detail="Database error: " + str(e))
