@@ -63,12 +63,12 @@ def add_or_update_address(user_id: int, address_data: AddressCreate, db: Session
     return existing_address if existing_address else new_address
 
 @router.get("/addresses/{address_id}", response_model=Address)
-def get_address_by_id(address_id: int, db: Session = Depends(get_db)):
-    return db.query(models.Address).filter(models.Address.id == address_id).first()
+def get_address_by_id(address_id: str, db: Session = Depends(get_db)):
+    return db.query(models.Address).filter(models.Address.direccion_ == address_id).first()
 
 @router.put("/addresses/{address_id}", response_model=Address)
-def update_address(address_id: int, address_update: AddressCreate, db: Session = Depends(get_db)):
-    address = db.query(models.Address).filter(models.Address.id == address_id).first()
+def update_address(address_id: str, address_update: AddressCreate, db: Session = Depends(get_db)):
+    address = db.query(models.Address).filter(models.Address.direccion_ == address_id).first()
     if not address:
         raise HTTPException(status_code=404, detail="Address not found")
     for field, value in address_update.dict().items():
@@ -78,15 +78,14 @@ def update_address(address_id: int, address_update: AddressCreate, db: Session =
     return address
 
 @router.delete("/addresses/{address_id}")
-def delete_address(address_id: int, db: Session = Depends(get_db)):
-    address = db.query(models.Address).filter(models.Address.id == address_id).first()
+def delete_address(address_id: str, db: Session = Depends(get_db)):
+    address = db.query(models.Address).filter(models.Address.direccion_ == address_id).first()
     if not address:
         raise HTTPException(status_code=404, detail="Address not found")
     db.delete(address)
     db.commit()
     return {"message": "Address deleted successfully"}
 
-#------------------------Verificar autenticación--------------1----------
 @router.post("/verify-token")
 def verify_token(token: str):
     try:
