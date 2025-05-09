@@ -6,6 +6,7 @@ import jwt
 from core.config import Config
 from users.schemas import UserCreate, UserOut
 from users.models import Address
+from users.models import Address, User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -24,7 +25,7 @@ def create_jwt_token(user_id: int):
     return token
 
 def register_user(db: Session, user: schemas.UserCreate):
-    existing_user = db.query(models.User).filter(models.User.mail == user.mail).first()
+    existing_user = db.query(User).filter(User.mail == user.mail).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
@@ -45,7 +46,7 @@ def register_user(db: Session, user: schemas.UserCreate):
     hashed_password = hash_password(user.password)
     role = "admin" if user.mail in ADMIN_EMAILS else "user"
 
-    new_user = models.User(
+    new_user = User(
         name=user.name,
         mail=user.mail,
         telefono=user.telefono,
