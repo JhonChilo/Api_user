@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL")
+SQLALCHEMY_DATABASE_URL = "postgresql+psycopg2://postgres:72942250@172.31.16.52:8005/bd_usuarios"
 
 def wait_for_db():
     while True:
