@@ -35,9 +35,13 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
         if db_user:
             raise HTTPException(status_code=400, detail="Email already registered")
 
+        # Obtener el último id y sumarle 1
+        last_user = db.query(User).order_by(User.id.desc()).first()
+        next_id = 1 if last_user is None else last_user.id + 1
+
         hashed_password = hash_password(user.password)
-        # rol y usrdir por defecto, fecha_creacion automática
         new_user = User(
+            id=next_id,
             name=user.name,
             mail=user.mail,
             telefono=user.telefono,
@@ -68,7 +72,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail="Error: " + str(e))
-    
+
 @router.post("/login")
 def login_user(user: UserLogin, db: Session = Depends(get_db)):
     try:
