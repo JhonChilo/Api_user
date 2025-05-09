@@ -6,6 +6,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    restart: always
     environment:
       - SQLALCHEMY_DATABASE_URL=postgresql+psycopg2://postgres:72942250@35.169.164.120:8005/bd_usuarios
     networks:
