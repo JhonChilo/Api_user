@@ -14,6 +14,20 @@ def hash_password(password: str) -> str:
     return hashed_password.decode('utf-8')
 
 def create_user(db: Session, user: schemas.UserCreate):
+    # Si usrdir viene y no existe la dirección, la crea
+    if user.usrdir:
+        direccion = db.query(models.Address).filter(models.Address.direccion_ == user.usrdir).first()
+        if not direccion:
+            # Puedes ajustar estos valores por defecto según tu lógica o pedirlos en el registro
+            nueva_direccion = models.Address(
+                direccion_=user.usrdir,
+                distrito="Desconocido",
+                codigo_postal=None,
+                pais="Desconocido"
+            )
+            db.add(nueva_direccion)
+            db.commit()
+            db.refresh(nueva_direccion)
     role = "admin" if user.mail in ADMIN_EMAILS else "user"
     hashed_password = hash_password(user.password)
     db_user = models.User(
