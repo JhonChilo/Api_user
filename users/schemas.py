@@ -2,8 +2,17 @@ from pydantic import BaseModel
 from typing import Optional
 
 # -------- User Schemas --------
-class UserBase(BaseModel):
-    email: str
+class User(BaseModel):
+    id: int
+    name: str
+    mail: str
+    telefono: str | None = None
+    usrdir: str | None = None
+    rol: str
+    fecha_creacion: str | None = None
+
+    class Config:
+        from_attributes = True  # Para Pydantic v2, antes era orm_mode = True
 
 class UserCreate(UserBase):
     password: str
