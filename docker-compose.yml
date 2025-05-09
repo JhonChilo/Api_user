@@ -1,5 +1,5 @@
 services:
-  app:
+  api-usuarios:
     container_name: api-usuarios
     build:
       context: .
@@ -7,10 +7,10 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - SQLALCHEMY_DATABASE_URL="postgresql+psycopg2://postgres:72942250@35.169.164.120:8005/bd_usuarios"
+      - SQLALCHEMY_DATABASE_URL=postgresql+psycopg2://postgres:72942250@35.169.164.120:8005/bd_usuarios
     networks:
       - internal_network
-      
+
 networks:
   internal_network:
     external: true
