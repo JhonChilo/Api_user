@@ -10,8 +10,13 @@ from core.database import get_db
 router = APIRouter()
 
 @router.get("/addresses", response_model=List[Address])
-def get_all_addresses(db: Session = Depends(get_db)):
-    return db.query(models.Address).all()# ---------------- LEER USUARIO ----------------
+def get_all_addresses(page: int = 1, size: int = 10, db: Session = Depends(get_db)):
+    if page < 1 or size < 1:
+        raise HTTPException(status_code=400, detail="Page and size must be greater than 0")
+    skip = (page - 1) * size
+    addresses = db.query(models.Address).offset(skip).limit(size).all()
+    return addresses
+
 @router.get("/{user_id}", response_model=schemas.User)
 def get_user(user_id: int, db: Session = Depends(get_db)):
     return service.get_user(db, user_id)
