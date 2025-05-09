@@ -30,24 +30,25 @@ ADMIN_EMAILS = ["jhon.chilo@utec.edu.pe", "sergio.delgado.a@utec.edu.pe"]
 @router.post("/register", response_model=UserOut)
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
     try:
-        with db.begin():
-            db_user = db.query(User).filter(User.mail == user.mail).first()
-            if db_user:
-                raise HTTPException(status_code=400, detail="Email already registered")
+        db_user = db.query(User).filter(User.mail == user.mail).first()
+        if db_user:
+            raise HTTPException(status_code=400, detail="Email already registered")
 
-            hashed_password = hash_password(user.password)
-            role = "admin" if user.mail in ADMIN_EMAILS else "user"
+        hashed_password = hash_password(user.password)
+        role = "admin" if user.mail in ADMIN_EMAILS else "user"
 
-            new_user = User(
-                name=user.name,
-                mail=user.mail,
-                telefono=user.telefono,
-                usrdir=user.usrdir,
-                rol=role,
-                password=hashed_password,
-                fecha_creacion=user.fecha_creacion
-            )
-            db.add(new_user)
+        new_user = User(
+            name=user.name,
+            mail=user.mail,
+            telefono=user.telefono,
+            usrdir=user.usrdir,
+            rol=role,
+            password=hashed_password,
+            fecha_creacion=user.fecha_creacion
+        )
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
         return new_user
     except SQLAlchemyError as e:
         db.rollback()
@@ -58,8 +59,11 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
 
 @router.post("/login")
 def login_user(user: UserLogin, db: Session = Depends(get_db)):
-    db_user = db.query(User).filter(User.mail == user.mail).first()
-    if not db_user or not verify_password(user.password, db_user.password):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-    token = create_jwt_token(db_user.id)
-    return {"access_token": token, "token_type": "bearer"}
+    try:
+        db_user = db.query(User).filter(User.mail == user.mail).first()
+        if not db_user or not verify_password(user.password, db_user.password):
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+        token = create_jwt_token(db_user.id)
+        return {"access_token": token, "token_type": "bearer"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error: " + str(e))

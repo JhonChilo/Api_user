@@ -11,87 +11,109 @@ router = APIRouter()
 
 @router.get("/addresses", response_model=List[Address])
 def get_all_addresses(page: int = 1, size: int = 10, db: Session = Depends(get_db)):
-    if page < 1 or size < 1:
-        raise HTTPException(status_code=400, detail="Page and size must be greater than 0")
-    skip = (page - 1) * size
-    addresses = db.query(models.Address).offset(skip).limit(size).all()
-    return addresses
+    try:
+        if page < 1 or size < 1:
+            raise HTTPException(status_code=400, detail="Page and size must be greater than 0")
+        skip = (page - 1) * size
+        addresses = db.query(models.Address).offset(skip).limit(size).all()
+        return addresses
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error fetching addresses: " + str(e))
 
 @router.get("/{user_id}", response_model=schemas.User)
 def get_user(user_id: int, db: Session = Depends(get_db)):
-    return service.get_user(db, user_id)
+    try:
+        return service.get_user(db, user_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error fetching user: " + str(e))
 
-# ---------------- LEER TODOS LOS USUARIOS ----------------
 @router.get("", response_model=List[schemas.User])
 def get_users(page: int = 1, size: int = 10, db: Session = Depends(get_db)):
-    if page < 1 or size < 1:
-        raise HTTPException(status_code=400, detail="Page and size must be greater than 0")
-    
-    skip = (page - 1) * size
-    return service.get_users(db, skip, size)
+    try:
+        if page < 1 or size < 1:
+            raise HTTPException(status_code=400, detail="Page and size must be greater than 0")
+        skip = (page - 1) * size
+        return service.get_users(db, skip, size)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error fetching users: " + str(e))
 
 @router.put("/{user_id}", response_model=schemas.User)
 def update_user(user_id: int, user_update: schemas.UserUpdate, db: Session = Depends(get_db)):
-    current_user_role = "admin"  # Este valor debería ser dinámico según el usuario autenticado
-    return service.update_user(db, user_id, user_update, current_user_role)
+    try:
+        current_user_role = "admin"  # Este valor debería ser dinámico según el usuario autenticado
+        return service.update_user(db, user_id, user_update, current_user_role)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error updating user: " + str(e))
 
 @router.delete("/{user_id}")
 def delete_user(user_id: int, db: Session = Depends(get_db)):
-    return service.delete_user(db, user_id)
+    try:
+        return service.delete_user(db, user_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error deleting user: " + str(e))
 
-# ---------------- AÑADIR O ACTUALIZAR DIRECCIÓN ----------------
 @router.post("/{user_id}/address", response_model=Address)
 def add_or_update_address(user_id: int, address_data: AddressCreate, db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    existing_address = db.query(models.Address).filter(models.Address.user_id == user_id).first()
-    if existing_address:
-        existing_address.street = address_data.street
-        existing_address.city = address_data.city
-        existing_address.country = address_data.country
-        existing_address.postal_code = address_data.postal_code
-    else:
-        new_address = models.Address(
-            user_id=user_id,
-            street=address_data.street,
-            city=address_data.city,
-            country=address_data.country,
-            postal_code=address_data.postal_code
-        )
-        db.add(new_address)
-
-    db.commit()
-    db.refresh(existing_address if existing_address else new_address)
-
-    return existing_address if existing_address else new_address
+    try:
+        user = db.query(models.User).filter(models.User.id == user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        address = db.query(models.Address).filter(models.Address.direccion_ == address_data.direccion_).first()
+        if not address:
+            address = models.Address(
+                direccion_=address_data.direccion_,
+                distrito=address_data.distrito,
+                codigo_postal=address_data.codigo_postal,
+                pais=address_data.pais
+            )
+            db.add(address)
+            db.commit()
+            db.refresh(address)
+        user.usrdir = address.direccion_
+        db.commit()
+        db.refresh(user)
+        return address
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Error assigning address: " + str(e))
 
 @router.get("/addresses/{address_id}", response_model=Address)
 def get_address_by_id(address_id: str, db: Session = Depends(get_db)):
-    address = db.query(models.Address).filter(models.Address.direccion_ == address_id).first()
-    if not address:
-        raise HTTPException(status_code=404, detail="Address not found")
-    return address
+    try:
+        address = db.query(models.Address).filter(models.Address.direccion_ == address_id).first()
+        if not address:
+            raise HTTPException(status_code=404, detail="Address not found")
+        return address
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error fetching address: " + str(e))
+
 @router.put("/addresses/{address_id}", response_model=Address)
 def update_address(address_id: str, address_update: AddressCreate, db: Session = Depends(get_db)):
-    address = db.query(models.Address).filter(models.Address.direccion_ == address_id).first()
-    if not address:
-        raise HTTPException(status_code=404, detail="Address not found")
-    for field, value in address_update.dict().items():
-        setattr(address, field, value)
-    db.commit()
-    db.refresh(address)
-    return address
+    try:
+        address = db.query(models.Address).filter(models.Address.direccion_ == address_id).first()
+        if not address:
+            raise HTTPException(status_code=404, detail="Address not found")
+        for field, value in address_update.dict().items():
+            setattr(address, field, value)
+        db.commit()
+        db.refresh(address)
+        return address
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Error updating address: " + str(e))
 
 @router.delete("/addresses/{address_id}")
 def delete_address(address_id: str, db: Session = Depends(get_db)):
-    address = db.query(models.Address).filter(models.Address.direccion_ == address_id).first()
-    if not address:
-        raise HTTPException(status_code=404, detail="Address not found")
-    db.delete(address)
-    db.commit()
-    return {"message": "Address deleted successfully"}
+    try:
+        address = db.query(models.Address).filter(models.Address.direccion_ == address_id).first()
+        if not address:
+            raise HTTPException(status_code=404, detail="Address not found")
+        db.delete(address)
+        db.commit()
+        return {"message": "Address deleted successfully"}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Error deleting address: " + str(e))
 
 @router.post("/verify-token")
 def verify_token(token: str):
@@ -102,3 +124,23 @@ def verify_token(token: str):
         raise HTTPException(status_code=401, detail="Token expired")
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
+
+@router.put("/{user_id}/assign-address")
+def assign_address(user_id: int, direccion: str, db: Session = Depends(get_db)):
+    try:
+        user = db.query(models.User).filter(models.User.id == user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        address = db.query(models.Address).filter(models.Address.direccion_ == direccion).first()
+        if not address:
+            address = models.Address(direccion_=direccion, distrito="Desconocido", codigo_postal=None, pais="Desconocido")
+            db.add(address)
+            db.commit()
+            db.refresh(address)
+        user.usrdir = direccion
+        db.commit()
+        db.refresh(user)
+        return user
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Error assigning address: " + str(e))

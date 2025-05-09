@@ -24,24 +24,10 @@ def create_jwt_token(user_id: int):
     token = jwt.encode({"sub": user_id, "exp": expiration}, Config.SECRET_KEY, algorithm="HS256")
     return token
 
-def register_user(db: Session, user: schemas.UserCreate):
+def register_user(db: Session, user: UserCreate):
     existing_user = db.query(User).filter(User.mail == user.mail).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-
-    # Si usrdir viene y no existe la dirección, la crea
-    if user.usrdir:
-        direccion = db.query(Address).filter(Address.direccion_ == user.usrdir).first()
-        if not direccion:
-            nueva_direccion = Address(
-                direccion_=user.usrdir,
-                distrito="Desconocido",
-                codigo_postal=None,
-                pais="Desconocido"
-            )
-            db.add(nueva_direccion)
-            db.commit()
-            db.refresh(nueva_direccion)
 
     hashed_password = hash_password(user.password)
     role = "admin" if user.mail in ADMIN_EMAILS else "user"
@@ -50,7 +36,7 @@ def register_user(db: Session, user: schemas.UserCreate):
         name=user.name,
         mail=user.mail,
         telefono=user.telefono,
-        usrdir=user.usrdir,
+        usrdir=user.usrdir,  # Puede ser None
         rol=role,
         password=hashed_password,
         fecha_creacion=user.fecha_creacion
