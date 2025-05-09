@@ -27,7 +27,7 @@ def create_jwt_token(user_id: int):
 
 ADMIN_EMAILS = ["jhon.chilo@utec.edu.pe", "sergio.delgado.a@utec.edu.pe"]
 
-router.post("/register")
+@router.post("/register")
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
     try:
         db_user = db.query(User).filter(User.mail == user.mail).first()
