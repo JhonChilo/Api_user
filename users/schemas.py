@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
-
+from datetime import date
 # -------- User Schemas --------
 class UserBase(BaseModel):
     name: str
@@ -8,7 +8,7 @@ class UserBase(BaseModel):
     telefono: Optional[str] = None
     usrdir: Optional[str] = None
     rol: str
-    fecha_creacion: Optional[str] = None
+    fecha_creacion: Optional[date] = None
 
     class Config:
         from_attributes = True  # Para Pydantic v2
