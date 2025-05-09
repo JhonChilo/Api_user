@@ -28,6 +28,20 @@ def register_user(db: Session, user: schemas.UserCreate):
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
+    # Si usrdir viene y no existe la dirección, la crea
+    if user.usrdir:
+        direccion = db.query(Address).filter(Address.direccion_ == user.usrdir).first()
+        if not direccion:
+            nueva_direccion = Address(
+                direccion_=user.usrdir,
+                distrito="Desconocido",
+                codigo_postal=None,
+                pais="Desconocido"
+            )
+            db.add(nueva_direccion)
+            db.commit()
+            db.refresh(nueva_direccion)
+
     hashed_password = hash_password(user.password)
     role = "admin" if user.mail in ADMIN_EMAILS else "user"
 
