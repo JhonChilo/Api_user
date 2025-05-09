@@ -13,13 +13,11 @@ class UserBase(BaseModel):
     class Config:
         from_attributes = True  # Para Pydantic v2
 
+
 class UserCreate(BaseModel):
     name: str
     mail: str
     telefono: Optional[str] = None
-    usrdir: Optional[str] = None
-    rol: str
-    fecha_creacion: Optional[date] = None
     password: str
 
 class UserLogin(BaseModel):

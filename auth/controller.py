@@ -27,7 +27,7 @@ def create_jwt_token(user_id: int):
 
 ADMIN_EMAILS = ["jhon.chilo@utec.edu.pe", "sergio.delgado.a@utec.edu.pe"]
 
-@router.post("/register")
+router.post("/register")
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
     try:
         db_user = db.query(User).filter(User.mail == user.mail).first()
@@ -35,25 +35,22 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
             raise HTTPException(status_code=400, detail="Email already registered")
 
         hashed_password = hash_password(user.password)
-        role = "admin" if user.mail in ADMIN_EMAILS else "user"
-
+        # rol y usrdir por defecto, fecha_creacion automática
         new_user = User(
             name=user.name,
             mail=user.mail,
             telefono=user.telefono,
-            usrdir=user.usrdir,
-            rol=role,
+            usrdir=None,
+            rol="user",
             password=hashed_password,
-            fecha_creacion=user.fecha_creacion
+            fecha_creacion=date.today()
         )
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
 
-        # Generar el token
         token = create_jwt_token(new_user.id)
 
-        # Retornar id, token y datos del usuario
         return {
             "id": new_user.id,
             "name": new_user.name,
@@ -70,7 +67,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail="Error: " + str(e))
-
+    
 @router.post("/login")
 def login_user(user: UserLogin, db: Session = Depends(get_db)):
     try:
