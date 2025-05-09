@@ -7,6 +7,7 @@ from passlib.context import CryptContext
 import jwt
 from datetime import datetime, timedelta
 from sqlalchemy.exc import SQLAlchemyError
+from datetime import date
 
 router = APIRouter()
 
