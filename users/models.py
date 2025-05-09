@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from core.database import Base
 
 class User(Base):
-    __tablename__ = "users"
+    __tablename__ = "usuarios"
 
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String(50), unique=True, index=True)  # Longitud definida
@@ -15,7 +15,7 @@ class User(Base):
 
 
 class Address(Base):
-    __tablename__ = "addresses"
+    __tablename__ = "direccion"
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), unique=True, nullable=False)
