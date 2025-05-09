@@ -48,3 +48,6 @@ class AddressCreate(AddressBase):
 class Address(AddressBase):
     class Config:
         from_attributes = True
+
+class UserOut(User):
+    pass
