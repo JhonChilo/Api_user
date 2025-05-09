@@ -39,8 +39,11 @@ def get_user(db: Session, user_id: int):
     return user
 
 def get_users(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(models.User).offset(skip).limit(limit).all()
-
+    try:
+        return db.query(models.User).offset(skip).limit(limit).all()
+    except Exception as e:
+        print("ERROR EN get_users:", e)
+        raise
 # ---------------- ACTUALIZAR USUARIO ----------------
 def update_user(db: Session, user_id: int, user_update: schemas.UserUpdate, current_user_role: str):
     # Solo los administradores pueden cambiar el rol
