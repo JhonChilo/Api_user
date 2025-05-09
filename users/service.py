@@ -14,18 +14,17 @@ def hash_password(password: str) -> str:
     return hashed_password.decode('utf-8')
 
 def create_user(db: Session, user: schemas.UserCreate):
-
-    role = "admin" if user.email in ADMIN_EMAILS else "user"  # Asigna admin si el correo está en la lista
-
-    # Hashear la contraseña antes de guardarla
+    role = "admin" if user.mail in ADMIN_EMAILS else "user"
     hashed_password = hash_password(user.password)
-
     db_user = models.User(
-        email=user.email,
+        name=user.name,
+        mail=user.mail,
+        telefono=user.telefono,
+        usrdir=user.usrdir,
+        rol=role,
         password=hashed_password,
-        role=role
+        fecha_creacion=user.fecha_creacion
     )
-
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -46,25 +45,23 @@ def get_users(db: Session, skip: int = 0, limit: int = 10):
         raise
 # ---------------- ACTUALIZAR USUARIO ----------------
 def update_user(db: Session, user_id: int, user_update: schemas.UserUpdate, current_user_role: str):
-    # Solo los administradores pueden cambiar el rol
-    if user_update.role and current_user_role != "admin":
-        raise HTTPException(status_code=403, detail="Not authorized to change user role")
-
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    if user_update.email:
-        user.email = user_update.email
-    if user_update.password:
-        user.password = hash_password(user_update.password)  # Hashear la nueva contraseña
-    if user_update.role:
-        user.role = user_update.role
+    # Solo actualiza los campos permitidos
+    if user_update.name is not None:
+        user.name = user_update.name
+    if user_update.mail is not None:
+        user.mail = user_update.mail
+    if user_update.usrdir is not None:
+        user.usrdir = user_update.usrdir
+    if user_update.telefono is not None:
+        user.telefono = user_update.telefono
 
     db.commit()
     db.refresh(user)
     return user
-
 def delete_user(db: Session, user_id: int):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:

@@ -30,45 +30,36 @@ ADMIN_EMAILS = ["jhon.chilo@utec.edu.pe", "sergio.delgado.a@utec.edu.pe"]
 @router.post("/register", response_model=UserOut)
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
     try:
-        # Iniciar una transacción explícita
-        with db.begin():  # db.begin() abre una transacción
-            # Verificar si el email ya está registrado
-            db_user = db.query(User).filter(User.email == user.email).first()
+        with db.begin():
+            db_user = db.query(User).filter(User.mail == user.mail).first()
             if db_user:
                 raise HTTPException(status_code=400, detail="Email already registered")
 
-            # Hashear la contraseña
             hashed_password = hash_password(user.password)
+            role = "admin" if user.mail in ADMIN_EMAILS else "user"
 
-            # Asignamos rol automático basado en el correo
-            role = "admin" if user.email in ADMIN_EMAILS else "user"
-
-            # Crear el nuevo usuario
-            new_user = User(username=user.username, email=user.email, password=hashed_password, role=role)
+            new_user = User(
+                name=user.name,
+                mail=user.mail,
+                telefono=user.telefono,
+                usrdir=user.usrdir,
+                rol=role,
+                password=hashed_password,
+                fecha_creacion=user.fecha_creacion
+            )
             db.add(new_user)
-
-        # Si todo está bien, se hace commit automáticamente
-
         return new_user
     except SQLAlchemyError as e:
-        db.rollback()  # Asegurarse de que se haga rollback si hay un error
+        db.rollback()
         raise HTTPException(status_code=500, detail="Database error: " + str(e))
     except Exception as e:
-        db.rollback()  # Asegurarse de que se haga rollback si hay un error no relacionado con la base de datos
+        db.rollback()
         raise HTTPException(status_code=500, detail="Error: " + str(e))
-
 
 @router.post("/login")
 def login_user(user: UserLogin, db: Session = Depends(get_db)):
-    # Buscar al usuario por email
-    db_user = db.query(User).filter(User.email == user.email).first()
-    
-    # Verificar si el usuario existe y si la contraseña es correcta
+    db_user = db.query(User).filter(User.mail == user.mail).first()
     if not db_user or not verify_password(user.password, db_user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    
-    # Crear el token JWT
     token = create_jwt_token(db_user.id)
-    
-    # Devolver el token JWT
     return {"access_token": token, "token_type": "bearer"}

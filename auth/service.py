@@ -24,27 +24,22 @@ def create_jwt_token(user_id: int):
     return token
 
 def register_user(db: Session, user: schemas.UserCreate):
-    existing_user = db.query(models.User).filter(models.User.email == user.email).first()
+    existing_user = db.query(models.User).filter(models.User.mail == user.mail).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
     hashed_password = hash_password(user.password)
-    role = "admin" if user.email in ADMIN_EMAILS else "user"
+    role = "admin" if user.mail in ADMIN_EMAILS else "user"
 
     new_user = models.User(
-        email=user.email,
+        name=user.name,
+        mail=user.mail,
+        telefono=user.telefono,
+        usrdir=user.usrdir,
+        rol=role,
         password=hashed_password,
-        role=role
+        fecha_creacion=user.fecha_creacion
     )
-
-    if user.address:
-        address = Address(
-            country=user.address.country,
-            city=user.address.city,
-            street=user.address.street,
-            postal_code=user.address.postal_code
-        )
-        new_user.address = address
 
     db.add(new_user)
     db.commit()
@@ -52,7 +47,7 @@ def register_user(db: Session, user: schemas.UserCreate):
     return new_user
 
 def login_user(db: Session, user: schemas.UserLogin):
-    db_user = db.query(models.User).filter(models.User.email == user.email).first()
+    db_user = db.query(models.User).filter(models.User.mail == user.mail).first()
     if not db_user or not verify_password(user.password, db_user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
