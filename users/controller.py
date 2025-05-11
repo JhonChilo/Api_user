@@ -5,9 +5,13 @@ from typing import List
 from . import schemas, service, models
 from .schemas import AddressCreate, Address
 from core.database import get_db
+from pydantic import BaseModel
 
 
 router = APIRouter()
+
+class MessageResponse(BaseModel):
+    message: str
 
 @router.get("/addresses", response_model=List[Address])
 def get_all_addresses(page: int = 1, size: int = 10, db: Session = Depends(get_db)):
@@ -45,10 +49,11 @@ def update_user(user_id: int, user_update: schemas.UserUpdate, db: Session = Dep
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error updating user: " + str(e))
 
-@router.delete("/{user_id}")
+@router.delete("/{user_id}", response_model=MessageResponse)
 def delete_user(user_id: int, db: Session = Depends(get_db)):
     try:
-        return service.delete_user(db, user_id)
+        service.delete_user(db, user_id)
+        return {"message": "User deleted successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error deleting user: " + str(e))
 
@@ -119,7 +124,7 @@ def delete_address(address_id: str, db: Session = Depends(get_db)):
 def verify_token(token: str):
     try:
         payload = jwt.decode(token, "your_secret_key", algorithms=["HS256"])
-        return {"valid": True, "user_id": payload.get("sub")}
+        return {"valid": True, "user_id": payload.get("sub"), "role": payload.get("role")}
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
     except jwt.InvalidTokenError:
