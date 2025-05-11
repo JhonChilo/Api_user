@@ -92,6 +92,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
         db.rollback()
         raise HTTPException(status_code=500, detail="Error inesperado: " + str(e))
 
+
 @router.post("/login")
 def login_user(user: UserLogin, db: Session = Depends(get_db)):
     try:
@@ -102,14 +103,37 @@ def login_user(user: UserLogin, db: Session = Depends(get_db)):
 
         db_user = db.query(User).filter(User.mail == user.mail).first()
         if not db_user:
-            raise HTTPException(status_code=401, detail="El correo no está registrado.")
+            # Usuario no existe
+            raise HTTPException(
+                status_code=401,
+                detail="El correo no está registrado.",
+                headers={"X-Error-Type": "user_not_found"}
+            )
         if not verify_password(user.password, db_user.password):
-            raise HTTPException(status_code=401, detail="La contraseña es incorrecta.")
+            # Contraseña incorrecta
+            raise HTTPException(
+                status_code=401,
+                detail="La contraseña es incorrecta.",
+                headers={"X-Error-Type": "wrong_password"}
+            )
         token = create_jwt_token(db_user.id, db_user.rol)
         return {"access_token": token, "token_type": "bearer"}
     except AttributeError as e:
-        raise HTTPException(status_code=422, detail=f"Error de atributo: {str(e)}. Verifica los nombres de los campos enviados.")
+        raise HTTPException(
+            status_code=422,
+            detail=f"Error de atributo: {str(e)}. Verifica los nombres de los campos enviados.",
+            headers={"X-Error-Type": "attribute_error"}
+        )
     except TypeError as e:
-        raise HTTPException(status_code=422, detail=f"Error de tipo de dato: {str(e)}. Verifica los tipos de los campos enviados.")
+        raise HTTPException(
+            status_code=422,
+            detail=f"Error de tipo de dato: {str(e)}. Verifica los tipos de los campos enviados.",
+            headers={"X-Error-Type": "type_error"}
+        )
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Error inesperado: " + str(e))
+        raise HTTPException(
+            status_code=500,
+            detail="Error inesperado: " + str(e),
+            headers={"X-Error-Type": "unexpected_error"}
+        )
+# ...código existente...
