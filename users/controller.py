@@ -120,12 +120,19 @@ def delete_address(address_id: str, db: Session = Depends(get_db)):
         db.rollback()
         raise HTTPException(status_code=500, detail="Error deleting address: " + str(e))
 
+class TokenRequest(BaseModel):
+    token: str
+    
 @router.post("/verify-token")
-def verify_token(token: str):
-    print(f"Verifying token: {token}")
+def verify_token(body: TokenRequest):
+    print(f"Verifying token: {body.token}")
     try:
-        payload = jwt.decode(token, "your_secret_key", algorithms=["HS256"])
-        return {"valid": True, "user_id": payload.get("sub"), "role": payload.get("role")}
+        payload = jwt.decode(body.token, "your_secret_key", algorithms=["HS256"])
+        return {
+            "valid": True,
+            "user_id": payload.get("sub"),
+            "role": payload.get("role")
+        }
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
     except jwt.InvalidTokenError:
