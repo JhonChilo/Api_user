@@ -25,7 +25,7 @@ def create_jwt_token(user_id: int, rol: str):
     expiration = datetime.utcnow() + timedelta(hours=1)
     token = jwt.encode(
         {"user_id": user_id, "rol": rol, "exp": expiration},
-        "your_secret_key",
+        "72942250",
         algorithm="HS256"
     )
     return token
