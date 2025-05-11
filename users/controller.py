@@ -122,12 +122,12 @@ def delete_address(address_id: str, db: Session = Depends(get_db)):
 
 class TokenRequest(BaseModel):
     token: str
-    
+
 @router.post("/verify-token")
 def verify_token(body: TokenRequest):
     print(f"Verifying token: {body.token}")
     try:
-        payload = jwt.decode(body.token, "your_secret_key", algorithms=["HS256"])
+        payload = jwt.decode(body.token, "72942250", algorithms=["HS256"])
         return {
             "valid": True,
             "user_id": payload.get("sub"),
