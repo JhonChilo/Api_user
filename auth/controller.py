@@ -103,14 +103,12 @@ def login_user(user: UserLogin, db: Session = Depends(get_db)):
 
         db_user = db.query(User).filter(User.mail == user.mail).first()
         if not db_user:
-            # Usuario no existe
             raise HTTPException(
                 status_code=401,
                 detail="El correo no está registrado.",
                 headers={"X-Error-Type": "user_not_found"}
             )
         if not verify_password(user.password, db_user.password):
-            # Contraseña incorrecta
             raise HTTPException(
                 status_code=401,
                 detail="La contraseña es incorrecta.",
@@ -130,6 +128,9 @@ def login_user(user: UserLogin, db: Session = Depends(get_db)):
             detail=f"Error de tipo de dato: {str(e)}. Verifica los tipos de los campos enviados.",
             headers={"X-Error-Type": "type_error"}
         )
+    except HTTPException as e:
+        # Permite que FastAPI maneje los HTTPException correctamente
+        raise e
     except Exception as e:
         raise HTTPException(
             status_code=500,
