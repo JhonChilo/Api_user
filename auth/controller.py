@@ -116,9 +116,12 @@ def login_user(user: UserLogin, db: Session = Depends(get_db)):
             )
         if not verify_password(user.password, db_user.password):
             raise HTTPException(
-                status_code=400,
+                status_code=401,
                 detail="La contraseña es incorrecta.",
-                headers={"X-Error-Type": "wrong_password"}
+                headers={
+                    "X-Error-Type": "wrong_password",
+                    "WWW-Authenticate": "Bearer"
+                }
             )
         token = create_jwt_token(db_user.id, db_user.rol)
         return {"access_token": token, "token_type": "bearer"}
