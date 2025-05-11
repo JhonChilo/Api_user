@@ -47,7 +47,11 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
 
         db_user = db.query(User).filter(User.mail == user.mail).first()
         if db_user:
-            raise HTTPException(status_code=400, detail="El correo ya está registrado.")
+            raise HTTPException(
+                status_code=400,
+                detail="El correo ya está registrado.",
+                headers={"X-Error-Type": "mail_exists"}
+            )
 
         last_user = db.query(User).order_by(User.id.desc()).first()
         next_id = 1 if last_user is None else last_user.id + 1
@@ -81,17 +85,19 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
         }
     except AttributeError as e:
         db.rollback()
-        raise HTTPException(status_code=422, detail=f"Error de atributo: {str(e)}. Verifica los nombres de los campos enviados.")
+        raise HTTPException(status_code=422, detail=f"Error de atributo: {str(e)}. Verifica los nombres de los campos enviados.", headers={"X-Error-Type": "attribute_error"})
     except TypeError as e:
         db.rollback()
-        raise HTTPException(status_code=422, detail=f"Error de tipo de dato: {str(e)}. Verifica los tipos de los campos enviados.")
+        raise HTTPException(status_code=422, detail=f"Error de tipo de dato: {str(e)}. Verifica los tipos de los campos enviados.", headers={"X-Error-Type": "type_error"})
     except SQLAlchemyError as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail="Error de base de datos: " + str(e))
+        raise HTTPException(status_code=500, detail="Error de base de datos: " + str(e), headers={"X-Error-Type": "db_error"})
+    except HTTPException as e:
+        db.rollback()
+        raise e
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail="Error inesperado: " + str(e))
-
+        raise HTTPException(status_code=500, detail="Error inesperado: " + str(e), headers={"X-Error-Type": "unexpected_error"})
 
 @router.post("/login")
 def login_user(user: UserLogin, db: Session = Depends(get_db)):
@@ -104,13 +110,13 @@ def login_user(user: UserLogin, db: Session = Depends(get_db)):
         db_user = db.query(User).filter(User.mail == user.mail).first()
         if not db_user:
             raise HTTPException(
-                status_code=401,
+                status_code=400,
                 detail="El correo no está registrado.",
                 headers={"X-Error-Type": "user_not_found"}
             )
         if not verify_password(user.password, db_user.password):
             raise HTTPException(
-                status_code=401,
+                status_code=400,
                 detail="La contraseña es incorrecta.",
                 headers={"X-Error-Type": "wrong_password"}
             )
@@ -137,4 +143,3 @@ def login_user(user: UserLogin, db: Session = Depends(get_db)):
             detail="Error inesperado: " + str(e),
             headers={"X-Error-Type": "unexpected_error"}
         )
-# ...código existente...
