@@ -7,3 +7,7 @@ app = FastAPI()
 # Registrar los routers para las rutas de autenticación y usuarios
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(users_router, prefix="/users", tags=["users"])
+
+@app.get("/")
+def root():
+    return {"message": "API User funcionando correctamente"}
