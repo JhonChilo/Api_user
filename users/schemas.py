@@ -19,7 +19,7 @@ class UserCreate(BaseModel):
     mail: str = Field(..., example="pedro@gmail.com")
     telefono: Optional[str] = Field(None, example="987654321")
     password: str = Field(..., example="supersegura123")
-    usrdir: Optional[str] = Field(None, example="Av. Siempre Viva 123"),
+    usrdir: Optional[str] = Field(None, example="Av. Siempre Viva 123")
     fecha_creacion: Optional[date] = Field(None, example="2025-05-13")
     class Config:
         schema_extra = {
