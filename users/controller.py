@@ -126,16 +126,16 @@ class TokenRequest(BaseModel):
 
 @router.post("/verify-token")
 def verify_token(body: TokenRequest):
-    print(f"Verifying token: {body.token} for user_id: {body.user_id}")
+    print(f"Verifying token: {body.token} for usuario_id: {body.usuario_id}")
     try:
         payload = jwt.decode(body.token, "72942250", algorithms=["HS256"])
         token_user_id = payload.get("user_id") or payload.get("sub")
-        if str(token_user_id) != str(body.user_id):
+        if str(token_user_id) != str(body.usuario_id):
             raise HTTPException(status_code=401, detail="El token no pertenece al usuario indicado")
         return {
             "valid": True,
-            "user_id": token_user_id,
-            "role": payload.get("role")
+            "usuario": token_user_id,
+            "role": payload.get("role") or payload.get("rol")
         }
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
