@@ -3,10 +3,8 @@ from fastapi import HTTPException
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 import jwt
-from core.config import Config
-from users.schemas import UserCreate, UserOut
-from users.models import Address
-from users.models import Address, User
+from users.schemas import UserCreate, UserLogin
+from users.models import User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -51,10 +49,10 @@ def register_user(db: Session, user: UserCreate):
     db.refresh(new_user)
     return new_user
 
-def login_user(db: Session, user: schemas.UserLogin):
-    db_user = db.query(models.User).filter(models.User.mail == user.mail).first()
+def login_user(db: Session, user: UserLogin):
+    db_user = db.query(User).filter(User.mail == user.mail).first()
     if not db_user or not verify_password(user.password, db_user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    token = create_jwt_token(db_user.id, db_user.rol)  # <-- Corrección aquí
-    return {"access_token": token, "token_type": "bearer"}
+    token = create_jwt_token(db_user.id, db_user.rol)
+    return {"access_token": token, "token_type": "bearer", "id": db_user.id, "rol": db_user.rol}
