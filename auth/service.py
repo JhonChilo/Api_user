@@ -31,10 +31,15 @@ def register_user(db: Session, user: UserCreate):
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
+        # Generar el siguiente id disponible
+    last_user = db.query(User).order_by(User.id.desc()).first()
+    next_id = (last_user.id + 1) if last_user else 1
+
     hashed_password = hash_password(user.password)
     role = "admin" if user.mail in ADMIN_EMAILS else "user"
 
     new_user = User(
+        id=next_id,
         name=user.name,
         mail=user.mail,
         telefono=user.telefono,
