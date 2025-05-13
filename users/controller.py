@@ -122,7 +122,7 @@ def delete_address(address_id: str, db: Session = Depends(get_db)):
 
 class TokenRequest(BaseModel):
     token: str
-    usuarios_id: int 
+    usuario_id: int 
 
 @router.post("/verify-token")
 def verify_token(body: TokenRequest):
