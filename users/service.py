@@ -1,3 +1,4 @@
+from datetime import date
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from . import models, schemas
@@ -21,10 +22,10 @@ def create_user(db: Session, user: schemas.UserCreate):
             name=user.name,
             mail=user.mail,
             telefono=user.telefono,
-            usrdir=user.usrdir,  # Puede ser None
+            usrdir=user.usrdir,
             rol=role,
             password=hashed_password,
-            fecha_creacion=user.fecha_creacion
+            fecha_creacion=user.fecha_creacion or date.today()  # <-- aquí se asigna la fecha de hoy si no viene
         )
         db.add(db_user)
         db.commit()
