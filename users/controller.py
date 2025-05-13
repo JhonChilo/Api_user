@@ -6,6 +6,7 @@ from . import schemas, service, models
 from .schemas import AddressCreate, Address
 from core.database import get_db
 from pydantic import BaseModel
+from fastapi import Query
 
 router = APIRouter()
 
@@ -106,12 +107,17 @@ def assign_address(usuario_id: int, direccion: str, db: Session = Depends(get_db
         raise HTTPException(status_code=500, detail="Error assigning address: " + str(e))
 
 @router.post("/verify-token")
-def verify_token(body: TokenRequest):
-    print(f"Verifying token: {body.token} for usuario_id: {body.usuario_id}")
+def verify_token(
+    body: TokenRequest,
+    usuario_id: int = Query(None, description="ID del usuario a verificar (opcional, prioridad sobre el body)")
+):
+    # Si usuario_id viene como query param, lo usamos; si no, usamos el del body
+    usuario_id_final = usuario_id if usuario_id is not None else body.usuario_id
+    print(f"Verifying token: {body.token} for usuario_id: {usuario_id_final}")
     try:
         payload = jwt.decode(body.token, "72942250", algorithms=["HS256"])
         token_usuario_id = payload.get("usuario_id") or payload.get("sub")
-        if str(token_usuario_id) != str(body.usuario_id):
+        if str(token_usuario_id) != str(usuario_id_final):
             raise HTTPException(status_code=401, detail="El token no pertenece al usuario indicado")
         return {
             "valid": True,
