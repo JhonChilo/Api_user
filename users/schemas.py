@@ -19,14 +19,15 @@ class UserCreate(BaseModel):
     mail: str = Field(..., example="pedro@gmail.com")
     telefono: Optional[str] = Field(None, example="987654321")
     password: str = Field(..., example="supersegura123")
-
+    usrdir: Optional[str] = Field(None, example="Av. Siempre Viva 123")
     class Config:
         schema_extra = {
             "example": {
                 "name": "Pedro",
                 "mail": "pedro@gmail.com",
                 "telefono": "987654321",
-                "password": "supersegura123"
+                "password": "supersegura123",
+                "usrdir": "Av. Siempre Viva 123"
             }
         }
 
