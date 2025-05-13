@@ -77,10 +77,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
             "id": new_user.id,
             "name": new_user.name,
             "mail": new_user.mail,
-            "telefono": new_user.telefono,
-            "usrdir": new_user.usrdir,
             "rol": new_user.rol,
-            "fecha_creacion": new_user.fecha_creacion,
             "token": token
         }
     except AttributeError as e:
@@ -124,7 +121,12 @@ def login_user(user: UserLogin, db: Session = Depends(get_db)):
                 }
             )
         token = create_jwt_token(db_user.id, db_user.rol)
-        return {"access_token": token, "token_type": "bearer"}
+        return {
+            "access_token": token, 
+            "token_type": "bearer",
+            "id": db_user.id,
+            "rol": db_user.rol
+            }
     except AttributeError as e:
         raise HTTPException(
             status_code=422,
