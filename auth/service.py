@@ -19,9 +19,13 @@ def hash_password(password: str):
 def verify_password(plain_password: str, hashed_password: str):
     return pwd_context.verify(plain_password, hashed_password)
 
-def create_jwt_token(user_id: int):
+def create_jwt_token(usuario_id: int, rol: str):
     expiration = datetime.utcnow() + timedelta(hours=1)
-    token = jwt.encode({"sub": user_id, "exp": expiration}, Config.SECRET_KEY, algorithm="HS256")
+    token = jwt.encode(
+        {"usuario_id": usuario_id, "rol": rol, "exp": expiration},
+        "72942250",
+        algorithm="HS256"
+    )
     return token
 
 def register_user(db: Session, user: UserCreate):
@@ -52,5 +56,5 @@ def login_user(db: Session, user: schemas.UserLogin):
     if not db_user or not verify_password(user.password, db_user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    token = create_jwt_token(db_user.id)
+    token = create_jwt_token(db_user.id, db_user.rol)  # <-- Corrección aquí
     return {"access_token": token, "token_type": "bearer"}
