@@ -122,15 +122,19 @@ def delete_address(address_id: str, db: Session = Depends(get_db)):
 
 class TokenRequest(BaseModel):
     token: str
+    user_id: int 
 
 @router.post("/verify-token")
 def verify_token(body: TokenRequest):
-    print(f"Verifying token: {body.token}")
+    print(f"Verifying token: {body.token} for user_id: {body.user_id}")
     try:
         payload = jwt.decode(body.token, "72942250", algorithms=["HS256"])
+        token_user_id = payload.get("sub")
+        if str(token_user_id) != str(body.user_id):
+            raise HTTPException(status_code=401, detail="El token no pertenece al usuario indicado")
         return {
             "valid": True,
-            "user_id": payload.get("sub"),
+            "user_id": token_user_id,
             "role": payload.get("role")
         }
     except jwt.ExpiredSignatureError:
