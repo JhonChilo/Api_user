@@ -129,7 +129,7 @@ def verify_token(body: TokenRequest):
     print(f"Verifying token: {body.token} for user_id: {body.user_id}")
     try:
         payload = jwt.decode(body.token, "72942250", algorithms=["HS256"])
-        token_user_id = payload.get("sub")
+        token_user_id = payload.get("user_id") or payload.get("sub")
         if str(token_user_id) != str(body.user_id):
             raise HTTPException(status_code=401, detail="El token no pertenece al usuario indicado")
         return {
