@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from core.database import Base
+from sqlalchemy import Date
 
 class Address(Base):
     __tablename__ = "direccion"
@@ -15,13 +16,13 @@ class Address(Base):
 class User(Base):
     __tablename__ = "usuarios"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=False)
     name = Column(String(255), nullable=False)
     mail = Column(String(255), unique=True, index=True, nullable=False)
     telefono = Column(String(255), nullable=True)
     usrdir = Column(String(255), ForeignKey("direccion.direccion_"), nullable=True)
     rol = Column(String(255), nullable=False)
     password = Column(String(255), nullable=False)
-    fecha_creacion = Column(String, nullable=True)  # O usa Date si lo prefieres
+    fecha_creacion = Column(Date, nullable=True)  # O usa Date si lo prefieres
 
     address = relationship("Address", back_populates="users", uselist=False)

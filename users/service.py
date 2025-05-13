@@ -16,16 +16,21 @@ def hash_password(password: str) -> str:
 
 def create_user(db: Session, user: schemas.UserCreate):
     try:
+        # Obtener el siguiente id disponible
+        last_user = db.query(models.User).order_by(models.User.id.desc()).first()
+        next_id = (last_user.id + 1) if last_user else 1
+
         role = "admin" if user.mail in ADMIN_EMAILS else "user"
         hashed_password = hash_password(user.password)
         db_user = models.User(
+            id=next_id,  # <-- Aquí asignas el id generado
             name=user.name,
             mail=user.mail,
             telefono=user.telefono,
             usrdir=user.usrdir,
             rol=role,
             password=hashed_password,
-            fecha_creacion=user.fecha_creacion or date.today()  # <-- aquí se asigna la fecha de hoy si no viene
+            fecha_creacion=user.fecha_creacion or date.today()
         )
         db.add(db_user)
         db.commit()
